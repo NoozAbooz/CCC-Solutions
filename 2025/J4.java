@@ -1,57 +1,40 @@
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 
 public class Main {
-	public static void main(String[] args) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        // StringTokenizer st = new StringTokenizer(br.readLine());
-        // Scanner r = new Scanner(System.in);
-		PrintWriter pw = new PrintWriter(System.out);
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        PrintWriter pw = new PrintWriter(System.out);
 
-		int n = Integer.parseInt(br.readLine());
-        int[] manta = new int[n];
-		
-        // read input into arr
-        for (int i = 0; i < n; i++) { 
-            if (br.readLine().charAt(0) == 80) { // P = 0, S = 1
-                manta[i] = 0;
-            } else {
-                manta[i] = 1;
-            }
+        int n = Integer.parseInt(br.readLine());
+        // true = sunny, false = precipitation
+        boolean[] sunny = new boolean[n];
+        for (int i = 0; i < n; i++) {
+            char c = br.readLine().charAt(0);
+            sunny[i] = (c != 'P');
         }
 
-        int maxDays = 0;
-        for (int i = 0; i < manta.length; i++) {
-            int conseq = 1; // manta[k] must be 1 rn so consequtive count starts at 1
-            boolean skippedOver = false;
-            if (manta[i] == 0) {
-                skippedOver = true;
-            }
+        int left = 0;
+        int precipCount = 0;
+        int maxLen = 0;
 
-            for (int k = i+1; k < manta.length; k++) { // start at next index down
-                if (manta[k] == 0) { // if is percipitation
-                    if (skippedOver == false) {
-                        conseq++;
-                        skippedOver = true;
-                    } else if (skippedOver = true) {
-                        break;
-                    }
-                } else { // if is sunny
-                    conseq++;
+        for (int right = 0; right < n; right++) {
+            if (!sunny[right]) {
+                precipCount++;
+            }
+            // shrink window until we have at most one precipitation
+            while (precipCount > 1) {
+                if (!sunny[left]) {
+                    precipCount--;
                 }
+                left++;
             }
-
-            if (conseq > maxDays) {
-                maxDays = conseq;
-            }
+            // window [left..right] has at most one precipitation
+            maxLen = Math.max(maxLen, right - left + 1);
         }
-        pw.println(maxDays);
 
-        // // print arr
-        // for (int i : manta) {
-        //     pw.println(i);
-        // }
-
-		pw.close();
-	}
+        pw.println(maxLen);
+        pw.close();
+    }
 }
